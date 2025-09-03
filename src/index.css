@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Force dark mode */
 html {
   color-scheme: dark;
 }
@@ -11,7 +10,7 @@ html.dark {
   color-scheme: dark;
 }
 
-/* Custom scrollbar styles */
+
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
@@ -36,7 +35,6 @@ html.dark {
     height: 8px;
   }
   
-  /* Hide scrollbar for body but keep functionality */
   body {
     scrollbar-width: thin;
     scrollbar-color: rgb(82 82 82) transparent;
