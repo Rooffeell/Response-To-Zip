@@ -27,7 +27,6 @@ export default function CodeEditor({ files, onFilesChange }: CodeEditorProps) {
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
   const [fileTree, setFileTree] = useState<FileTreeNode[]>([]);
 
-  // Build file tree structure
   useEffect(() => {
     const buildTree = (files: ParsedFile[]): FileTreeNode[] => {
       const tree: FileTreeNode[] = [];
@@ -43,7 +42,6 @@ export default function CodeEditor({ files, onFilesChange }: CodeEditorProps) {
           currentPath = currentPath ? `${currentPath}/${part}` : part;
 
           if (isLast) {
-            // It's a file
             const fileNode: FileTreeNode = {
               name: part,
               path: currentPath,
@@ -61,7 +59,6 @@ export default function CodeEditor({ files, onFilesChange }: CodeEditorProps) {
               tree.push(fileNode);
             }
           } else {
-            // It's a folder
             if (!folderMap.has(currentPath)) {
               const folderNode: FileTreeNode = {
                 name: part,
@@ -90,7 +87,6 @@ export default function CodeEditor({ files, onFilesChange }: CodeEditorProps) {
     };
 
     setFileTree(buildTree(files));
-    // Auto-expand root folders
     const rootFolders = new Set<string>();
     files.forEach(file => {
       const firstFolder = file.path.split('/')[0];
@@ -113,7 +109,6 @@ export default function CodeEditor({ files, onFilesChange }: CodeEditorProps) {
 
   const selectFile = (path: string, content: string) => {
     if (editMode && selectedFile) {
-      // Save current changes before switching
       saveChanges();
     }
     setSelectedFile(path);
@@ -240,18 +235,14 @@ export default function CodeEditor({ files, onFilesChange }: CodeEditorProps) {
       </div>
       
       <div className="flex h-96">
-        {/* File Tree */}
         <div className="w-64 border-r border-neutral-700 bg-neutral-950 overflow-y-auto scrollbar-thin scrollbar-track-neutral-800 scrollbar-thumb-neutral-600">
           <div className="p-2">
             {fileTree.map(node => renderTreeNode(node))}
           </div>
         </div>
-
-        {/* Editor Area */}
         <div className="flex-1 flex flex-col">
           {selectedFile ? (
             <>
-              {/* Editor Header */}
               <div className="flex items-center justify-between p-3 border-b border-neutral-700 bg-neutral-900">
                 <div className="flex items-center gap-2">
                   <File size={16} className="text-neutral-400" />
@@ -287,7 +278,6 @@ export default function CodeEditor({ files, onFilesChange }: CodeEditorProps) {
                 </div>
               </div>
 
-              {/* Editor */}
               <div className="flex-1">
                 <Editor
                   height="100%"
