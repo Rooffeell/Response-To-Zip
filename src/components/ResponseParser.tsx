@@ -49,7 +49,7 @@ Follow these instructions strictly:
 
 Begin now.`;
 
-  // Auto-save to localStorage
+
   useEffect(() => {
     const saved = localStorage.getItem('responseToZip_content');
     if (saved) {
@@ -101,7 +101,6 @@ Begin now.`;
         continue;
       }
 
-      // Skip folder structure lines
       if (line.match(/^[\s]*[├└│]\s*/) || 
           line.match(/^[\s]*[├└]\─\─/) ||
           line.match(/^[\s]*[│]\s*$/) ||
@@ -109,10 +108,8 @@ Begin now.`;
         continue;
       }
 
-      // Detect Claude's comment-style file markers: // filename
       const commentFileMatch = line.match(/^\s*\/\/\s+(.+\.\w+)\s*$/);
       if (commentFileMatch) {
-        // Save previous file if exists
         if (currentFile) {
           files.push({
             path: currentFile,
@@ -120,17 +117,14 @@ Begin now.`;
           });
         }
         
-        // Start new file
         currentFile = commentFileMatch[1].trim();
         currentContent = [];
         skipNext = true;
         continue;
       }
 
-      // Detect file markers: --- [path] --- or \--- [path] ---
       const fileMarkerMatch = line.match(/^\s*\\?---\s*\[?([^\[\]]+?)\]?\s*---\s*$/);
       if (fileMarkerMatch) {
-        // Save previous file if exists
         if (currentFile) {
           files.push({
             path: currentFile,
@@ -138,17 +132,14 @@ Begin now.`;
           });
         }
         
-        // Start new file
         currentFile = fileMarkerMatch[1].trim();
         currentContent = [];
         skipNext = true;
         continue;
       }
 
-      // Alternative file marker format: just --- filepath ---
       const altFileMarkerMatch = line.match(/^\s*\\?---\s*([^\-]+?)\s*---\s*$/);
       if (altFileMarkerMatch && altFileMarkerMatch[1].includes('.')) {
-        // Save previous file if exists
         if (currentFile) {
           files.push({
             path: currentFile,
@@ -156,20 +147,17 @@ Begin now.`;
           });
         }
         
-        // Start new file
         currentFile = altFileMarkerMatch[1].trim();
         currentContent = [];
         skipNext = true;
         continue;
       }
 
-      // Add content to current file
       if (currentFile) {
         currentContent.push(line);
       }
     }
 
-    // Don't forget the last file
     if (currentFile) {
       files.push({
         path: currentFile,
@@ -208,7 +196,6 @@ Begin now.`;
 
     try {
       setIsGenerating(true);
-      // Parse the response
       const files = parseResponse(input);
       
       if (files.length === 0) {
@@ -217,17 +204,13 @@ Begin now.`;
 
       setParsedFiles(files);
 
-      // Create ZIP
       const zip = new JSZip();
       
       files.forEach(file => {
-        // Ensure the path doesn't start with /
         const normalizedPath = file.path.replace(/^\/+/, '');
         
-        // Create folders if the path contains directories
         const pathParts = normalizedPath.split('/');
         if (pathParts.length > 1) {
-          // Create intermediate folders
           let currentPath = '';
           for (let i = 0; i < pathParts.length - 1; i++) {
             currentPath += pathParts[i] + '/';
@@ -237,11 +220,9 @@ Begin now.`;
           }
         }
         
-        // Add the file with proper folder structure
         zip.file(normalizedPath, file.content);
       });
 
-      // Generate and download ZIP
       const zipBlob = await zip.generateAsync({type: "blob"});
       const url = URL.createObjectURL(zipBlob);
       
@@ -270,7 +251,6 @@ Begin now.`;
   return (
     <>
       <div className="w-full max-w-4xl mx-auto space-y-8">
-      {/* Input Section */}
       <div className="space-y-4">
         <label htmlFor="codeInput" className="block text-lg font-semibold text-neutral-200">
           Paste your AI code generation response here:
@@ -392,7 +372,6 @@ body {
         </button>
       </div>
 
-      {/* Status */}
       {status && (
         <div className={`p-4 rounded-lg border ${
           status.type === 'success' ? 'bg-green-900/20 border-green-700 text-green-200' :
@@ -403,7 +382,6 @@ body {
         </div>
       )}
 
-      {/* File List */}
       <CodeEditor files={parsedFiles} onFilesChange={handleFilesChange} />
       </div>
       
